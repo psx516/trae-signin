@@ -148,8 +148,8 @@ jobs:
              --arg title "$TITLE" \
              --arg msg "$MSG" \
             '{
-               title: "$TITLE",
-               msg: "$BODY"
+               title: "${TITLE}",
+               msg: "${BODY}"
             }')
 
           curl -s --max-time 15 -X POST "${BARK_URL}?msgType=text"\
