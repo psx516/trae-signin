@@ -109,14 +109,23 @@ fi
 
 BODY="总计${TOTAL} | 成功${OK} | 已签${ALREADY} | 失败${FAIL} | 签到奖励${SIGNIN} | 总剩余${REMAIN}"$'\n'"${ACCOUNTS}"
 
+# 使用jq构造json
+json_body=$(jq -n \
+  --arg title "$TITLE" \
+  --arg msg "$MSG" \
+  '{
+    title: "$TITLE",
+    msg: $BODY
+  }')
+
 # 发送 MeoW 通知
 if [ -n "$BARK_URL" ]; then
-  TITLE_ENC="$(encode "$TITLE")"
-  BODY_ENC="$(encode "$BODY")"
+  # TITLE_ENC="$(encode "$TITLE")"
+  # BODY_ENC="$(encode "$BODY")"
   if command -v curl >/dev/null 2>&1; then
-    curl -s -X POST "${BARK_URL}/${TITLE_ENC}/"\
-    -H "Content-Type: application/text/plain" \
-    -d "${BODY_ENC}"\
+    curl -s -X POST "${BARK_URL}?msgType=text"\
+    -H "Content-Type: application/json" \
+    -d "${json_body}"\
     > /dev/null 2>&1 || true
     echo "📲 MeoW 通知已发送"
   else
