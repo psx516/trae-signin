@@ -93,7 +93,7 @@ encode() {
   fi
 }
 
-# 构建 Bark 推送内容
+# 构建 MeoW 推送内容
 TITLE="TRAE 签到"
 if [ "$SIGNIN_EXIT" -eq 0 ]; then
   if [ "${OK:-0}" -gt 0 ] 2>/dev/null; then
@@ -109,16 +109,19 @@ fi
 
 BODY="总计${TOTAL} | 成功${OK} | 已签${ALREADY} | 失败${FAIL} | 签到奖励${SIGNIN} | 总剩余${REMAIN}"$'\n'"${ACCOUNTS}"
 
-# 发送 Bark 通知
+# 发送 MeoW 通知
 if [ -n "$BARK_URL" ]; then
   TITLE_ENC="$(encode "$TITLE")"
   BODY_ENC="$(encode "$BODY")"
   if command -v curl >/dev/null 2>&1; then
-    curl -s -X POST "${BARK_URL}/${TITLE_ENC}/${BODY_ENC}" > /dev/null 2>&1 || true
-    echo "📲 Bark 通知已发送"
+    curl -s -X POST "${BARK_URL}/${TITLE_ENC}/"\
+    -H "Content-Type: application/text/plain" \
+    -d "${BODY_ENC}"\
+    > /dev/null 2>&1 || true
+    echo "📲 MeoW 通知已发送"
   else
-    echo "⚠️ 未找到 curl，无法发送 Bark 通知"
+    echo "⚠️ 未找到 curl，无法发送 MeoW 通知"
   fi
 else
-  echo "📲 未配置 BARK_URL，跳过 Bark 推送"
+  echo "📲 未配置 BARK_URL，跳过 MeoW 推送"
 fi
