@@ -142,9 +142,19 @@ jobs:
             if [ "${FAIL:-0}" -gt 0 ] 2>/dev/null; then TITLE="⚠️ TRAE 签到异常"; fi
             BODY="总计${TOTAL:-?} 成功${OK:-?} 已签${ALREADY:-?} 失败${FAIL:-?} 签到奖励${SIGNIN:-?} 剩余${REMAIN:-?}"
           fi
-          TITLE_ENC=$(python3 -c 'import urllib.parse,sys; print(urllib.parse.quote(sys.argv[1]))' "$TITLE")
-          BODY_ENC=$(python3 -c 'import urllib.parse,sys; print(urllib.parse.quote(sys.argv[1]))' "$BODY")
-          curl -s --max-time 15 -X POST "${BARK_URL}/${TITLE_ENC}/${BODY_ENC}" || true
+          # TITLE_ENC=$(python3 -c 'import urllib.parse,sys; print(urllib.parse.quote(sys.argv[1]))' "$TITLE")
+          # BODY_ENC=$(python3 -c 'import urllib.parse,sys; print(urllib.parse.quote(sys.argv[1]))' "$BODY")
+          json_body=$(jq -n \
+             --arg title "$TITLE" \
+             --arg msg "$MSG" \
+            '{
+               title: "$TITLE",
+               msg: $BODY
+            }')
+
+          curl -s --max-time 15 -X POST "${BARK_URL}?msgType=text"\
+             -H "Content-Type: application/json" \
+             -d "${json_body}" || true
 
       - name: 清理凭证
         if: always()
